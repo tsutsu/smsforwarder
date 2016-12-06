@@ -18,5 +18,4 @@ defmodule SMSForwarder.Message do
     {:ok, dt} = Calendar.DateTime.from_erl({date, time}, "Etc/UTC")
     dt
   end
-)
 end

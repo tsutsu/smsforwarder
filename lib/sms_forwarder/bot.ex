@@ -1,6 +1,5 @@
 defmodule SMSForwarder.Bot do
   use Slack
-  use Slack.Lookups
   require Logger
 
   def start_link do
@@ -9,7 +8,7 @@ defmodule SMSForwarder.Bot do
   end
 
   def received_sms(msg) do
-    __MODULE__ ! {:message, msg}
+    send(__MODULE__, {:message, msg})
   end
 
 
