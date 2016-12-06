@@ -8,6 +8,9 @@ defmodule SMSForwarder.Router do
 
   get "/send" do
     conn = Plug.Conn.fetch_query_params(conn)
+    msg = SMSForwarder.Message.new(conn.params)
+    SMSForwarder.Bot.received_sms(msg)
+
     Logger.info ["Received sendSMS req: ", inspect(conn.params)]
 
     "ok"

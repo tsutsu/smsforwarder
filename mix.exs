@@ -14,7 +14,7 @@ defmodule SMSForwarder.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :slack, :trot],
+    [applications: [:logger, :slack, :trot, :calendar],
      mod: {SMSForwarder, []}]
   end
 
@@ -29,6 +29,8 @@ defmodule SMSForwarder.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do [
     {:slack, "~> 0.9.0"},
-    {:trot, github: "hexedpackets/trot"}
+    {:trot, github: "tsutsu/trot"},
+    {:calendar, "~> 0.16.1"},
+    {:poison, "~> 3.0"}
   ] end
 end
