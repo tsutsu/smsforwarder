@@ -20,13 +20,13 @@ defmodule SMSForwarder.Bot do
   end
 
   def handle_event(message = %{type: "message"}, slack, state) do
-    send_message("I got a message!", message.channel, slack)
+    Logger.info ["Got a message: ", inspect(message)]
+
     {:ok, state}
   end
   def handle_event(_, _, state), do: {:ok, state}
 
   def handle_info({:message, msg}, slack, state) do
-    Logger.info "Sending your message, captain!"
 
     general_channel = lookup_channel_id("#general", slack)
     msg_str = Poison.encode!(msg)
