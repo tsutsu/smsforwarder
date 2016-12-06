@@ -4,7 +4,9 @@ defmodule SMSForwarder.Bot do
 
   def start_link do
     api_token = System.get_env("SLACK_API_TOKEN")
-    Slack.Bot.start_link(__MODULE__, [], api_token)
+    {:ok, bot_pid} = Slack.Bot.start_link(__MODULE__, [], api_token)
+    true = Process.register(bot_pid, __MODULE__)
+    {:ok, bot_pid}
   end
 
   def received_sms(msg) do
