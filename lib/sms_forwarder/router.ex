@@ -11,8 +11,6 @@ defmodule SMSForwarder.Router do
     msg = SMSForwarder.Message.new(conn.params)
     SMSForwarder.Bot.received_sms(msg)
 
-    Logger.info ["Received sendSMS req: ", inspect(conn.params)]
-
     "ok"
   end
 

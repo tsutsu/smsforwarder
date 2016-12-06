@@ -20,18 +20,27 @@ defmodule SMSForwarder.Bot do
   end
 
   def handle_event(message = %{type: "message"}, slack, state) do
-    Logger.info ["Got a message: ", inspect(message)]
+    if message.user != slack.me.id do
+      channel_name = lookup_channel_name(message.channel, slack)
+      if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
+        Logger.info ["Got a message from ", channel_name, ": ", inspect(message.text)]
+
+        Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
+          dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
+          VoIPms.Client.send(dest_did, message.text)
+        end)
+      end
+    end
 
     {:ok, state}
   end
   def handle_event(_, _, state), do: {:ok, state}
 
   def handle_info({:message, msg}, slack, state) do
+    channel_name = [0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(msg.from, r) end) |> Enum.join("-")
+    peer_channel = lookup_channel_id("##{channel_name}", slack)
 
-    general_channel = lookup_channel_id("#general", slack)
-    msg_str = Poison.encode!(msg)
-
-    send_message(msg_str, general_channel, slack)
+    send_message(msg.body, peer_channel, slack)
 
     {:ok, state}
   end

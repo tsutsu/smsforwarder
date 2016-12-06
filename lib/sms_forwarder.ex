@@ -8,7 +8,9 @@ defmodule SMSForwarder do
 
     # Define workers and child supervisors to be supervised
     children = [
-      worker(SMSForwarder.Bot, [])
+      supervisor(Task.Supervisor, [[name: SMSForwarder.TaskSupervisor]]),
+      worker(SMSForwarder.Bot, []),
+      worker(VoIPms.Client, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
