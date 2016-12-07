@@ -62,11 +62,9 @@ defmodule SMSForwarder.Slack.BotListener do
       {%{state | in_channels: Set.put(state.in_channels, channel_name)}, new_channel_id}
     end
 
-    sender_name = SMSForwarder.AddressBook.get(sms.from)
-    msg_event_opts = if sender_name do
-      %{as_user: false, username: sender_name}
-    else
-      %{as_user: true}
+    msg_event_opts = case SMSForwarder.AddressBook.get(sms.from) do
+      :undefined -> %{as_user: true}
+      nickname   -> %{as_user: false, username: nickname}
     end
 
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
