@@ -63,8 +63,14 @@ defmodule SMSForwarder.Slack.BotListener do
     end
 
     sender_name = SMSForwarder.AddressBook.get(sms.from)
+    msg_event_opts = if sender_name do
+      %{as_user: false, username: sender_name}
+    else
+      %{}
+    end
+
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
-      Slack.Web.Chat.post_message(dest_channel_id, sms.body, %{as_user: false, username: sender_name})
+      Slack.Web.Chat.post_message(dest_channel_id, sms.body, msg_event_opts)
     end)
 
     {:ok, state}
