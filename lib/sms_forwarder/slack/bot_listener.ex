@@ -32,13 +32,15 @@ defmodule SMSForwarder.Slack.BotListener do
 
   def handle_event(_message = %{type: "message", subtype: "bot_message"}, _slack, state), do: {:ok, state}
   def handle_event(message = %{type: "message"}, slack, state) do
-    Logger.debug ["Slack bot: received Slack event\n", inspect(message)]
+    if slack.me.id != message[:user] do
+      Logger.debug ["Slack bot: received Slack event\n", inspect(message)]
 
-    channel_name = lookup_channel_name(message.channel, slack)
-    if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
-      _dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
-      #VoIPms.Client.send(dest_did, message.text)
-      :ok
+      channel_name = lookup_channel_name(message.channel, slack)
+      if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
+        dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
+        SMSForwarder.VoIPms.Client.send(dest_did, message.text)
+        :ok
+      end
     end
 
     {:ok, state}

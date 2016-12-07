@@ -1,10 +1,12 @@
+require Logger
+
 defmodule SMSForwarder.VoIPms.Client do
   use GenServer
 
   @api_base_uri "https://voip.ms/api/v1/rest.php"
 
   def start_link(api_credentials, account_id) do
-    GenServer.start_link(__MODULE__, [api_credentials, account_id])
+    GenServer.start_link(__MODULE__, [api_credentials, account_id], name: __MODULE__)
   end
 
   def send(dest_did, msg_body) do
@@ -15,7 +17,7 @@ defmodule SMSForwarder.VoIPms.Client do
 
   defstruct api_username: nil, api_password: nil, dids: []
 
-  def init({api_username, api_password}, account_id) do
+  def init([{api_username, api_password}, account_id]) do
     GenServer.cast(self, {:query_sms_enabled_dids, account_id})
     {:ok, %__MODULE__{api_username: api_username, api_password: api_password}}
   end
@@ -33,10 +35,15 @@ defmodule SMSForwarder.VoIPms.Client do
   def handle_cast(request, state), do: super(request, state)
 
   def handle_call({:send_sms, dest_did, msg_body}, _from, state) do
-    req_uri = state |> build_request_uri(:sendSMS, did: state.did, dst: dest_did, message: msg_body)
+    {_source_acct, source_did} = List.first(state.dids)
+
+    req_uri = state |> build_request_uri(:sendSMS, did: source_did, dst: dest_did, message: msg_body)
 
     Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
-      HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Poison.decode!
+      msg_hash = :crypto.hash(:sha256, msg_body) |> Base.encode32(case: :lower, padding: :false) |> String.slice(0..7)
+      Logger.debug ["Sending SMS [", msg_hash, "] ", source_did, "->", dest_did, ": ", msg_body]
+      %{"status" => "success", "sms" => _} = HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Poison.decode!
+      Logger.debug ["Sent SMS [", msg_hash, "]"]
     end)
 
     {:reply, :sending, state}
