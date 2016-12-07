@@ -14,7 +14,7 @@ defmodule SMSForwarder.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :slack, :trot, :calendar, :httpoison],
+    [applications: [:logger, :slack, :trot, :calendar, :httpoison, :exredis],
      mod: {SMSForwarder, []}]
   end
 
@@ -32,6 +32,7 @@ defmodule SMSForwarder.Mixfile do
     {:httpoison, "~> 0.9.0"},
     {:trot, github: "tsutsu/trot"},
     {:calendar, "~> 0.16.1"},
-    {:poison, "~> 3.0"}
+    {:poison, "~> 3.0"},
+    {:exredis, "~> 0.2.5"}
   ] end
 end

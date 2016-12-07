@@ -1,7 +1,7 @@
 defmodule SMSForwarder.Message do
   defstruct id: nil, from: nil, to: nil, timestamp: nil, body: nil
 
-  def new(%{"date" => msg_ts, "from" => msg_from, "to" => msg_to, "id" => msg_id, "message" => msg_body}) do
+  def from_voipms(%{"date" => msg_ts, "from" => msg_from, "to" => msg_to, "id" => msg_id, "message" => msg_body}) do
     %__MODULE__{
       id: String.to_integer(msg_id),
       timestamp: parse_ts(msg_ts),
