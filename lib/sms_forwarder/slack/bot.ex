@@ -66,7 +66,7 @@ defmodule SMSForwarder.Slack.BotListener do
     msg_event_opts = if sender_name do
       %{as_user: false, username: sender_name}
     else
-      %{}
+      %{as_user: true}
     end
 
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
