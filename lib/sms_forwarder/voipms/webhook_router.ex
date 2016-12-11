@@ -30,6 +30,7 @@ defmodule SMSForwarder.VoIPms.WebhookRouter do
   end
 
   post "/receive/twilio" do
+    Logger.debug ["params: ", inspect(conn.params)]
     msg = SMSForwarder.Message.from_twilio(conn.params)
     SMSForwarder.Slack.BotListener.received_sms(msg)
     {204, ""}
