@@ -22,7 +22,7 @@ defmodule SMSForwarder.Message do
   end
 
   defp normalize_twilio_phn(e164_str) do
-    Regex.run(~r/\d+/, e164_str) |> List.first
+    Regex.run(~r/\+1(\d{10})/, e164_str) |> Enum.at(1)
   end
 
   defp parse_twilio_ts(ts) do
