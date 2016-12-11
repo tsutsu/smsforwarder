@@ -33,6 +33,7 @@ defmodule SMSForwarder.Mixfile do
     {:trot, github: "tsutsu/trot"},
     {:calendar, "~> 0.16.1"},
     {:poison, "~> 3.0"},
-    {:exredis, "~> 0.2.5"}
+    {:exredis, "~> 0.2.5"},
+    {:xml_builder, "~> 0.0.8"}
   ] end
 end

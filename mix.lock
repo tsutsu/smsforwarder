@@ -9,7 +9,7 @@
   "hackney": {:hex, :hackney, "1.6.3", "d489d7ca2d4323e307bedc4bfe684323a7bf773ecfd77938f3ee8074e488e140", [:mix, :rebar3], [{:certifi, "0.7.0", [hex: :certifi, optional: false]}, {:idna, "1.2.0", [hex: :idna, optional: false]}, {:metrics, "1.0.1", [hex: :metrics, optional: false]}, {:mimerl, "1.0.2", [hex: :mimerl, optional: false]}, {:ssl_verify_fun, "1.1.1", [hex: :ssl_verify_fun, optional: false]}]},
   "httpoison": {:hex, :httpoison, "0.9.2", "a211a8e87403a043c41218e64df250d321f236ac57f786c6a0ccf3e9e817c819", [:mix], [{:hackney, "~> 1.6.0", [hex: :hackney, optional: false]}]},
   "idna": {:hex, :idna, "1.2.0", "ac62ee99da068f43c50dc69acf700e03a62a348360126260e87f2b54eced86b2", [:rebar3], []},
-  "jsx": {:hex, :jsx, "2.8.0", "749bec6d205c694ae1786d62cea6cc45a390437e24835fd16d12d74f07097727", [:mix, :rebar], []},
+  "jsx": {:hex, :jsx, "2.8.1", "1453b4eb3615acb3e2cd0a105d27e6761e2ed2e501ac0b390f5bbec497669846", [:mix, :rebar3], []},
   "metrics": {:hex, :metrics, "1.0.1", "25f094dea2cda98213cecc3aeff09e940299d950904393b2a29d191c346a8486", [:rebar3], []},
   "mime": {:hex, :mime, "1.0.1", "05c393850524767d13a53627df71beeebb016205eb43bfbd92d14d24ec7a1b51", [:mix], []},
   "mimerl": {:hex, :mimerl, "1.0.2", "993f9b0e084083405ed8252b99460c4f0563e41729ab42d9074fd5e52439be88", [:rebar3], []},
@@ -17,8 +17,9 @@
   "plug_heartbeat": {:hex, :plug_heartbeat, "0.2.0", "912485e20cf483da21d6dfd4f6ed0dcc8d497f497b123231a73a326239b3f2f1", [:mix], [{:cowboy, ">= 1.0.0", [hex: :cowboy, optional: false]}, {:plug, ">= 0.12.0", [hex: :plug, optional: false]}]},
   "poison": {:hex, :poison, "3.0.0", "625ebd64d33ae2e65201c2c14d6c85c27cc8b68f2d0dd37828fde9c6920dd131", [:mix], []},
   "ranch": {:hex, :ranch, "1.2.1", "a6fb992c10f2187b46ffd17ce398ddf8a54f691b81768f9ef5f461ea7e28c762", [:make], []},
-  "slack": {:hex, :slack, "0.9.0", "d7b7de43fad57259f7a7b7fbc58117fdc99c9e892718debcfcbbda2410807547", [:mix], [{:exjsx, "~> 3.2.0", [hex: :exjsx, optional: false]}, {:httpoison, "~> 0.9.0", [hex: :httpoison, optional: false]}, {:websocket_client, "~> 1.1.0", [hex: :websocket_client, optional: false]}]},
+  "slack": {:hex, :slack, "0.9.1", "83ec25ebd532cea38a1280d756d7ab9a30fe07870fc59b43a080b2054f084d8c", [:mix], [{:exjsx, "~> 3.2.0", [hex: :exjsx, optional: false]}, {:httpoison, "~> 0.9.0", [hex: :httpoison, optional: false]}, {:websocket_client, "~> 1.1.0", [hex: :websocket_client, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [:make, :rebar], []},
   "trot": {:git, "https://github.com/tsutsu/trot.git", "52d26d7f8830f177d4dc6b7f356c61d04f1c7a21", []},
   "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},
-  "websocket_client": {:hex, :websocket_client, "1.1.0", "c1ac9162a2286d3ca747417b1717090e762becba1f9f0bde359cb0318b066636", [:rebar3], []}}
+  "websocket_client": {:hex, :websocket_client, "1.1.0", "c1ac9162a2286d3ca747417b1717090e762becba1f9f0bde359cb0318b066636", [:rebar3], []},
+  "xml_builder": {:hex, :xml_builder, "0.0.8", "dea10735e15c91e24582e41ee2d3282b7f0177a5b42d6268096a6221ba83226f", [:mix], []}}
