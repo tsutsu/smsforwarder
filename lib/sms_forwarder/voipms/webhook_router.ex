@@ -1,5 +1,8 @@
 defmodule SMSForwarder.VoIPms.WebhookRouter do
   require Logger
+
+  use Plug.Builder
+  plug Plug.Parsers, parsers: [:urlencoded, :multipart]
   use Trot.Router
 
   get "/contacts" do
@@ -24,6 +27,12 @@ defmodule SMSForwarder.VoIPms.WebhookRouter do
     SMSForwarder.Slack.BotListener.received_sms(msg)
 
     "ok"
+  end
+
+  post "/receive/twilio" do
+    msg = SMSForwarder.Message.from_twilio(conn.params)
+    SMSForwarder.Slack.BotListener.received_sms(msg)
+    {204, ""}
   end
 
   import_routes Trot.NotFound

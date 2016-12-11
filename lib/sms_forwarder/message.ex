@@ -1,17 +1,36 @@
 defmodule SMSForwarder.Message do
   defstruct id: nil, from: nil, to: nil, timestamp: nil, body: nil
 
+  def from_twilio(%{"date" => msg_ts, "From" => msg_from, "To" => msg_to, "MessageSid" => msg_id, "Body" => msg_body}) do
+    %__MODULE__{
+      id: msg_id,
+      timestamp: parse_twilio_ts(msg_ts),
+      from: normalize_twilio_phn(msg_from),
+      to: normalize_twilio_phn(msg_to),
+      body: msg_body
+    }
+  end
+
   def from_voipms(%{"date" => msg_ts, "from" => msg_from, "to" => msg_to, "id" => msg_id, "message" => msg_body}) do
     %__MODULE__{
       id: String.to_integer(msg_id),
-      timestamp: parse_ts(msg_ts),
+      timestamp: parse_voipms_ts(msg_ts),
       from: msg_from,
       to: msg_to,
       body: msg_body
     }
   end
 
-  defp parse_ts(ts) do
+  defp normalize_twilio_phn(e164_str) do
+    Regex.run(~r/\d+/, e164_str) |> List.first
+  end
+
+  defp parse_twilio_ts(ts) do
+    {:ok, dt} = Calendar.DateTime.Parse.rfc2822_utc(ts)
+    dt
+  end
+
+  defp parse_voipms_ts(ts) do
     [date_str, time_str] = ts |> String.split(" ")
     {{:ok, date}, {:ok, time}} = {Date.from_iso8601(date_str), Time.from_iso8601(time_str)}
     {date, time} = {Date.to_erl(date), Time.to_erl(time)}
