@@ -34,21 +34,25 @@ defmodule SMSForwarder.VoIPms.Client do
   end
   def handle_cast(request, state), do: super(request, state)
 
-  def handle_call({:send_sms, dest_did, msg_body}, _from, state) do
+  def handle_call({:send_sms, dest_did, text}, _from, state) do
     {_source_acct, source_did} = List.first(state.dids)
 
-    req_uri = state |> build_request_uri(:sendSMS, did: source_did, dst: dest_did, message: msg_body)
-
-    Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
-      msg_hash = :crypto.hash(:sha256, msg_body) |> Base.encode32(case: :lower, padding: :false) |> String.slice(0..7)
-      Logger.debug ["Sending SMS [", msg_hash, "] ", source_did, "->", dest_did, ": ", msg_body]
-      %{"status" => "success", "sms" => _} = HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Poison.decode!
-      Logger.debug ["Sent SMS [", msg_hash, "]"]
-    end)
+    send_sms_chunk(text, 0, {source_did, dest_did}, state)
 
     {:reply, :sending, state}
   end
   def handle_call(request, from, state), do: super(request, from, state)
+
+  defp send_sms_chunk(msg_chunk, delay, {source_did, dest_did}, state) when byte_size(msg_chunk) <= 160 do
+    Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
+      :timer.sleep(delay)
+      req_uri = state |> build_request_uri(:sendSMS, did: source_did, dst: dest_did, message: msg_chunk)
+      msg_hash = :crypto.hash(:sha256, msg_chunk) |> Base.encode32(case: :lower, padding: :false) |> String.slice(0..7)
+      Logger.debug ["Sending SMS [", msg_hash, "] ", source_did, "->", dest_did, ": ", msg_chunk]
+      %{"status" => "success", "sms" => _} = HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Poison.decode!
+      Logger.debug ["Sent SMS [", msg_hash, "]"]
+    end)
+  end
 
   defp build_request_uri(state, method, params) do
     req = %{
