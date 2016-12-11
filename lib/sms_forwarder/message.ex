@@ -1,10 +1,10 @@
 defmodule SMSForwarder.Message do
   defstruct id: nil, from: nil, to: nil, timestamp: nil, body: nil
 
-  def from_twilio(%{"date" => msg_ts, "From" => msg_from, "To" => msg_to, "MessageSid" => msg_id, "Body" => msg_body}) do
+  def from_twilio(%{"ApiVersion" => "2010-04-01", "From" => msg_from, "To" => msg_to, "MessageSid" => msg_id, "Body" => msg_body}) do
     %__MODULE__{
-      id: msg_id,
-      timestamp: parse_twilio_ts(msg_ts),
+      id: normalize_twilio_msg_id(msg_id),
+      timestamp: Calendar.DateTime.now!("UTC"),
       from: normalize_twilio_phn(msg_from),
       to: normalize_twilio_phn(msg_to),
       body: msg_body
@@ -23,6 +23,10 @@ defmodule SMSForwarder.Message do
 
   defp normalize_twilio_phn(e164_str) do
     Regex.run(~r/\+1(\d{10})/, e164_str) |> Enum.at(1)
+  end
+
+  def normalize_twilio_msg_id(msg_id) do
+    Regex.run(~r/SM([0-9a-f]{32})/, msg_id) |> Enum.at(1) |> String.to_integer(16)
   end
 
   defp parse_twilio_ts(ts) do
