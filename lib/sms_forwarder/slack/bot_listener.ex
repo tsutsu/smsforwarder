@@ -69,6 +69,13 @@ defmodule SMSForwarder.Slack.BotListener do
       nickname   -> %{as_user: false, username: nickname}
     end
 
+    msg_attachments = sms.attachments |> Enum.map(fn(att) -> %{
+      "fallback" => "#{att[:content_type]} #{att[:uri]}",
+      "image_uri" => att[:uri]
+    } end)
+
+    msg_event_opts = Map.put(msg_event_opts, :attachments, msg_attachments)
+
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
       Slack.Web.Chat.post_message(dest_channel_id, sms.body, msg_event_opts)
     end)
