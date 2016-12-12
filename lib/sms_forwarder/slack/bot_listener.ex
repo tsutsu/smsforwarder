@@ -74,7 +74,7 @@ defmodule SMSForwarder.Slack.BotListener do
       "image_uri" => att[:uri]
     } end)
 
-    msg_event_opts = Map.put(msg_event_opts, :attachments, msg_attachments)
+    msg_event_opts = Map.put(msg_event_opts, :attachments, Poison.encode!(msg_attachments))
 
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
       Slack.Web.Chat.post_message(dest_channel_id, sms.body, msg_event_opts)
