@@ -2,7 +2,7 @@ defmodule SMSForwarder.Message do
   defstruct id: nil, from: nil, to: nil, timestamp: nil, body: nil, attachments: []
 
   def from_twilio(%{"ApiVersion" => "2010-04-01", "From" => msg_from, "To" => msg_to, "MessageSid" => msg_id, "Body" => msg_body, "NumMedia" => attachment_count} = msg) do
-    attachments = case attachment_count do
+    attachments = case String.to_integer(attachment_count, 10) do
       0 -> []
       n -> extract_attachments(n, msg)
     end
