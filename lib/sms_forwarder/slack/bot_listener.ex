@@ -71,7 +71,7 @@ defmodule SMSForwarder.Slack.BotListener do
 
     msg_attachments = sms.attachments |> Enum.map(fn(att) -> %{
       "fallback" => "#{att[:content_type]} #{att[:uri]}",
-      "image_uri" => att[:uri]
+      "image_uri" => to_string(att[:uri])
     } end)
 
     msg_event_opts = Map.put(msg_event_opts, :attachments, Poison.encode!(msg_attachments))
