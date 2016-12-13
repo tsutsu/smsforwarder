@@ -112,7 +112,7 @@ defmodule SMSForwarder.Slack.BotListener do
   end
 
   defp received_slack_message(dest_did, %{subtype: "file_share"} = message, slack, state) do
-    file_mime = message[:file][:mimetype] |> String.split("/", 2) |> List.to_tuple
+    file_mime = message[:file][:mimetype] |> String.split("/", parts: 2) |> List.to_tuple
     received_slack_upload(file_mime, message, dest_did, slack, state)
   end
   defp received_slack_message(dest_did, message, _slack, _state) do
