@@ -22,8 +22,8 @@ defmodule SMSForwarder.Twilio.Client do
 
   def handle_cast(:query_sms_enabled_dids, state) do
     dids = ExTwilio.IncomingPhoneNumber.all |>
-      Enum.filter(fn(r) -> (r["capabilities"]["sms"] && r["capabilities"]["mms"]) end) |>
-      Enum.map(fn(r) -> r["phone_number"] end)
+      Enum.filter(fn(r) -> (r.capabilities["sms"] && r.capabilities["mms"]) end) |>
+      Enum.map(fn(r) -> r.phone_number end)
 
     {:noreply, %{state | dids: dids}}
   end
@@ -32,13 +32,13 @@ defmodule SMSForwarder.Twilio.Client do
   def handle_call({:send_sms, dest_did, text, atts}, _from, state) do
     {_source_acct, source_did} = List.first(state.dids)
 
-    send_sms({text, atts}, {source_did, dest_did}, state)
+    send_sms({text, atts}, {source_did, dest_did})
 
     {:reply, :sending, state}
   end
   def handle_call(request, from, state), do: super(request, from, state)
 
-  defp send_sms({msg_body, msg_atts}, {source_did, dest_did}, state) do
+  defp send_sms({msg_body, msg_atts}, {source_did, dest_did}) do
     req = %{
       from: source_did,
       to: e164(dest_did),
@@ -50,7 +50,7 @@ defmodule SMSForwarder.Twilio.Client do
       att -> %{req | media_url: att}
     end
 
-    resp = ExTwilio.Messages.create(req)
+    resp = ExTwilio.Message.create(req)
     Logger.debug ["Sent SMS: ", inspect(resp)]
   end
 

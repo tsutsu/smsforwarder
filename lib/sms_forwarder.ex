@@ -30,6 +30,7 @@ defmodule SMSForwarder do
       worker(SMSForwarder.Slack.Client, [slack_user_api_token, [name: SMSForwarder.Slack.UserIdentity]], id: SMSForwarder.Slack.UserClient),
       worker(SMSForwarder.Slack.Client, [slack_bot_api_token, [name: SMSForwarder.Slack.BotIdentity]], id: SMSForwarder.Slack.BotClient),
       worker(SMSForwarder.VoIPms.Client, [{voipms_username, voipms_password}, voipms_account]),
+      worker(SMSForwarder.Twilio.Client, []),
       supervisor(SMSForwarder.ConversationSupervisor, [[name: SMSForwarder.ConversationSupervisor]]),
       worker(SMSForwarder.Slack.BotListener, [])
     ]
