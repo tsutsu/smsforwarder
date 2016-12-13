@@ -86,7 +86,7 @@ defmodule SMSForwarder.Slack.BotListener do
 
 
   defp attachment_path(att_id) do
-    Path.join([:code.priv_dir(:sms_forwarder), "static", "attachment_cache", att_id])
+    Path.join([:code.priv_dir(:trot), "static", "attachment_cache", att_id])
   end
 
   defp received_slack_message(_dest_did, %{subtype: "file_share"} = message, _slack, _state) do
