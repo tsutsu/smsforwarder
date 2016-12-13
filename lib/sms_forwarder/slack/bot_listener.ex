@@ -91,24 +91,29 @@ defmodule SMSForwarder.Slack.BotListener do
     Path.join([:code.priv_dir(:trot), "static", "attachments", att_id])
   end
 
-  defp received_slack_message(_dest_did, %{subtype: "file_share"} = message, _slack, _state) do
-    Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
-      slack_auth = "Bearer #{System.get_env("SLACK_USER_API_TOKEN")}"
-      att = HTTPoison.get!(message[:file][:url_private_download], %{"Authorization" => slack_auth})
-      att_hash = :crypto.hash(:sha256, att.body) |> Base.encode32(case: :lower, padding: :false)
+  defp received_slack_upload(_dest_did, {"image", _}, message, _slack, _state) do
+    slack_auth = "Bearer #{System.get_env("SLACK_USER_API_TOKEN")}"
+    att = HTTPoison.get!(message[:file][:url_private_download], %{"Authorization" => slack_auth})
+    att_hash = :crypto.hash(:sha256, att.body) |> Base.encode32(case: :lower, padding: :false)
 
-      image_path = attachment_path(att_hash)
-      File.mkdir_p!(Path.dirname(image_path))
-      File.open(image_path, [:write], fn(f) ->
-        IO.binwrite(f, att.body)
-      end)
-
-      image_uri = Application.get_env(:trot, :base_uri)
-      image_uri = %{image_uri | path: "/attachments/#{att_hash}"}
-
-      Logger.debug ["New attachment URL: ", to_string(image_uri)]
-      # SMSForwarder.VoIPms.Client.send(dest_did, message.text)
+    image_newext = message[:file][:mimetype] |> MIME.extensions |> List.first
+    image_newname = "#{att_hash}.#{image_newext}"
+    image_newpath = attachment_path(image_newname)
+    File.mkdir_p!(Path.dirname(image_newpath))
+    File.open(image_newpath, [:write], fn(f) ->
+      IO.binwrite(f, att.body)
     end)
+
+    image_newuri = Application.get_env(:trot, :base_uri)
+    image_newuri = %{image_newuri | path: "/attachments/#{image_newname}"}
+
+    Logger.debug ["New attachment URL: ", to_string(image_newuri)]
+    # SMSForwarder.VoIPms.Client.send(dest_did, message.text)
+  end
+
+  defp received_slack_message(dest_did, %{subtype: "file_share"} = message, slack, state) do
+    file_mime = message[:file][:mimetype] |> String.split("/", 2) |> List.to_tuple
+    received_slack_upload(file_mime, message, dest_did, slack, state)
   end
   defp received_slack_message(dest_did, message, _slack, _state) do
     SMSForwarder.VoIPms.Client.send(dest_did, message.text)
