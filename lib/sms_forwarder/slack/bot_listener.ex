@@ -38,7 +38,7 @@ defmodule SMSForwarder.Slack.BotListener do
         dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
         Logger.debug ["Slack listener: received message event\n", inspect(message)]
         Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
-          received_slack_message(dest_did, message, slack, state)
+          received_slack_message(message, dest_did, slack, state)
         end)
       end
     end
@@ -91,7 +91,7 @@ defmodule SMSForwarder.Slack.BotListener do
     Path.join([:code.priv_dir(:trot), "static", "attachments", att_id])
   end
 
-  defp received_slack_upload(_dest_did, {"image", _}, message, _slack, _state) do
+  defp received_slack_upload({"image", _}, message, _dest_did, _slack, _state) do
     slack_auth = "Bearer #{System.get_env("SLACK_USER_API_TOKEN")}"
     att = HTTPoison.get!(message[:file][:url_private_download], %{"Authorization" => slack_auth})
     att_hash = :crypto.hash(:sha256, att.body) |> Base.encode32(case: :lower, padding: :false)
@@ -111,11 +111,11 @@ defmodule SMSForwarder.Slack.BotListener do
     # SMSForwarder.VoIPms.Client.send(dest_did, message.text)
   end
 
-  defp received_slack_message(dest_did, %{subtype: "file_share"} = message, slack, state) do
+  defp received_slack_message(%{subtype: "file_share"} = message, dest_did, slack, state) do
     file_mime = message[:file][:mimetype] |> String.split("/", parts: 2) |> List.to_tuple
     received_slack_upload(file_mime, message, dest_did, slack, state)
   end
-  defp received_slack_message(dest_did, message, _slack, _state) do
+  defp received_slack_message(message, dest_did, _slack, _state) do
     SMSForwarder.VoIPms.Client.send(dest_did, message.text)
   end
 end
