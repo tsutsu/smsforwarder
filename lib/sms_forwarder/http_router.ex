@@ -3,9 +3,8 @@ defmodule SMSForwarder.HTTPRouter do
 
   use Plug.Builder
   plug Plug.Parsers, parsers: [:urlencoded, :multipart]
+  plug Plug.Static, at: "/", from: :trot, only: ~w(attachments)
   use Trot.Router
-
-  static "/attachments", "attachment_cache"
 
   get "/contacts" do
     SMSForwarder.AddressBook.dump_all |> Poison.encode!
