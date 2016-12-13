@@ -30,7 +30,7 @@ defmodule SMSForwarder.Twilio.Client do
   def handle_cast(request, state), do: super(request, state)
 
   def handle_call({:send_sms, dest_did, text, atts}, _from, state) do
-    {_source_acct, source_did} = List.first(state.dids)
+    source_did = List.first(state.dids)
 
     send_sms({text, atts}, {source_did, dest_did})
 
@@ -46,8 +46,8 @@ defmodule SMSForwarder.Twilio.Client do
     }
 
     req = case List.first(msg_atts) do
-      nil -> req
-      att -> %{req | media_url: att}
+      nil     -> req
+      att_uri -> %{req | media_url: to_string(att_uri)}
     end
 
     resp = ExTwilio.Message.create(req)
