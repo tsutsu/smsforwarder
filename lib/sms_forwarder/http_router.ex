@@ -1,9 +1,11 @@
-defmodule SMSForwarder.VoIPms.WebhookRouter do
+defmodule SMSForwarder.HTTPRouter do
   require Logger
 
   use Plug.Builder
   plug Plug.Parsers, parsers: [:urlencoded, :multipart]
   use Trot.Router
+
+  static "/attachments", "attachment_cache"
 
   get "/contacts" do
     SMSForwarder.AddressBook.dump_all |> Poison.encode!

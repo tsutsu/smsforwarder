@@ -33,13 +33,11 @@ defmodule SMSForwarder.Slack.BotListener do
   def handle_event(_message = %{type: "message", subtype: "bot_message"}, _slack, state), do: {:ok, state}
   def handle_event(message = %{type: "message"}, slack, state) do
     if slack.me.id != message[:user] do
-      Logger.debug ["Slack bot: received Slack event\n", inspect(message)]
-
       channel_name = lookup_channel_name(message.channel, slack)
       if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
         dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
-        SMSForwarder.VoIPms.Client.send(dest_did, message.text)
-        :ok
+        Logger.debug ["Slack listener: received message event\n", inspect(message)]
+        received_slack_message(dest_did, message, slack, state)
       end
     end
 
@@ -85,4 +83,32 @@ defmodule SMSForwarder.Slack.BotListener do
     {:ok, state}
   end
   def handle_info(_, _, state), do: {:ok, state}
+
+
+  defp attachment_path(att_id) do
+    Path.join([:code.priv_dir(:sms_forwarder), "static", "attachment_cache", att_id])
+  end
+
+  defp received_slack_message(_dest_did, %{subtype: "file_share"} = message, _slack, _state) do
+    Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
+      slack_auth = "Bearer #{System.get_env("SLACK_USER_API_TOKEN")}"
+      att = HTTPoison.get!(message[:file][:url_private_download], %{"Authorization" => slack_auth})
+      att_hash = :crypto.hash(:sha256, att.body) |> Base.encode32(case: :lower, padding: :false)
+
+      image_path = attachment_path(att_hash)
+      File.mkdir_p!(Path.dirname(image_path))
+      File.open(image_path, [:write], fn(f) ->
+        IO.binwrite(f, att.body)
+      end)
+
+      image_uri = Application.get_env(:trot, :base_uri)
+      image_uri = %{image_uri | path: "/attachments/#{att_hash}"}
+
+      Logger.debug ["New attachment URL: ", to_string(image_uri)]
+      # SMSForwarder.VoIPms.Client.send(dest_did, message.text)
+    end)
+  end
+  defp received_slack_message(dest_did, message, _slack, _state) do
+    SMSForwarder.VoIPms.Client.send(dest_did, message.text)
+  end
 end
