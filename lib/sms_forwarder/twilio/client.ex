@@ -47,7 +47,7 @@ defmodule SMSForwarder.Twilio.Client do
 
     req = case List.first(msg_atts) do
       nil     -> req
-      att_uri -> %{req | media_url: to_string(att_uri)}
+      att_uri -> Map.put(req, :media_url, to_string(att_uri))
     end
 
     resp = ExTwilio.Message.create(req)
