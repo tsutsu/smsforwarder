@@ -37,7 +37,9 @@ defmodule SMSForwarder.Slack.BotListener do
       if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
         dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
         Logger.debug ["Slack listener: received message event\n", inspect(message)]
-        received_slack_message(dest_did, message, slack, state)
+        Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
+          received_slack_message(dest_did, message, slack, state)
+        end)
       end
     end
 
