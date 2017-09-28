@@ -16,7 +16,7 @@ defmodule SMSForwarder.Twilio.Client do
   defstruct dids: []
 
   def init([]) do
-    GenServer.cast(self, :query_sms_enabled_dids)
+    GenServer.cast(self(), :query_sms_enabled_dids)
     {:ok, %__MODULE__{}}
   end
 

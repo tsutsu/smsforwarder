@@ -18,7 +18,7 @@ defmodule SMSForwarder.VoIPms.Client do
   defstruct api_username: nil, api_password: nil, dids: []
 
   def init([{api_username, api_password}, account_id]) do
-    GenServer.cast(self, {:query_sms_enabled_dids, account_id})
+    GenServer.cast(self(), {:query_sms_enabled_dids, account_id})
     {:ok, %__MODULE__{api_username: api_username, api_password: api_password}}
   end
 
@@ -61,7 +61,7 @@ defmodule SMSForwarder.VoIPms.Client do
       method: to_string(method),
     }
     params = Enum.into(params, %{})
-    req = Dict.merge(req, params)
+    req = Map.merge(req, params)
     [@api_base_uri, URI.encode_query(req)] |> Enum.join("?")
   end
 end

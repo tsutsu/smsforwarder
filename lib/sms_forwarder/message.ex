@@ -42,10 +42,10 @@ defmodule SMSForwarder.Message do
     Regex.run(~r/[SM]M([0-9a-f]{32})/, msg_id) |> Enum.at(1) |> String.to_integer(16)
   end
 
-  defp parse_twilio_ts(ts) do
-    {:ok, dt} = Calendar.DateTime.Parse.rfc2822_utc(ts)
-    dt
-  end
+  # defp parse_twilio_ts(ts) do
+  #   {:ok, dt} = Calendar.DateTime.Parse.rfc2822_utc(ts)
+  #   dt
+  # end
 
   defp parse_voipms_ts(ts) do
     [date_str, time_str] = ts |> String.split(" ")

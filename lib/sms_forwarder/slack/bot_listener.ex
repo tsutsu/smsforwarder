@@ -50,7 +50,7 @@ defmodule SMSForwarder.Slack.BotListener do
   def handle_info({:echo_sms_to_slack, sms}, slack, state) do
     channel_name = [0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(sms.from, r) end) |> Enum.join("-")
 
-    {state, dest_channel_id} = if Set.member?(state.in_channels, channel_name) do
+    {state, dest_channel_id} = if MapSet.member?(state.in_channels, channel_name) do
       {state, lookup_channel_id("##{channel_name}", slack)}
     else
       bot_id = slack.me.id
@@ -61,7 +61,7 @@ defmodule SMSForwarder.Slack.BotListener do
         channel_id
       end)
 
-      {%{state | in_channels: Set.put(state.in_channels, channel_name)}, new_channel_id}
+      {%{state | in_channels: MapSet.put(state.in_channels, channel_name)}, new_channel_id}
     end
 
     msg_event_opts = case SMSForwarder.AddressBook.get(sms.from) do
