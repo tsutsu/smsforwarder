@@ -22,7 +22,7 @@
   "ranch": {:hex, :ranch, "1.3.2", "e4965a144dc9fbe70e5c077c65e73c57165416a901bd02ea899cfd95aa890986", [], [], "hexpm"},
   "slack": {:hex, :slack, "0.12.0", "a305f87adca043e056a86f92151d085a8c359718f9c4ca7f1d1012d67b75db8a", [], [{:httpoison, "~> 0.11", [hex: :httpoison, repo: "hexpm", optional: false]}, {:poison, "~> 3.0", [hex: :poison, repo: "hexpm", optional: false]}, {:websocket_client, "~> 1.2.4", [hex: :websocket_client, repo: "hexpm", optional: false]}], "hexpm"},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.1", "28a4d65b7f59893bc2c7de786dec1e1555bd742d336043fe644ae956c3497fbe", [], [], "hexpm"},
-  "trot": {:git, "https://github.com/tsutsu/trot.git", "6f8f3b724e0149cd9d68f2f27429649aef43f8ab", []},
+  "trot": {:hex, :trot, "0.6.0", "063abda761b30fdbd80fd0050fb58b051129efe452b9d996651896f62ad3673d", [], [{:calliope, "~> 0.4.2", [hex: :calliope, repo: "hexpm", optional: false]}, {:cowboy, "~> 1.1", [hex: :cowboy, repo: "hexpm", optional: false]}, {:plug, "~> 1.4", [hex: :plug, repo: "hexpm", optional: false]}, {:plug_heartbeat, "~> 0.2", [hex: :plug_heartbeat, repo: "hexpm", optional: false]}, {:poison, "~> 3.1", [hex: :poison, repo: "hexpm", optional: false]}], "hexpm"},
   "tzdata": {:hex, :tzdata, "0.5.12", "1c17b68692c6ba5b6ab15db3d64cc8baa0f182043d5ae9d4b6d35d70af76f67b", [], [{:hackney, "~> 1.0", [hex: :hackney, repo: "hexpm", optional: false]}], "hexpm"},
   "unicode_util_compat": {:hex, :unicode_util_compat, "0.3.1", "a1f612a7b512638634a603c8f401892afbf99b8ce93a45041f8aaca99cadb85e", [], [], "hexpm"},
   "websocket_client": {:hex, :websocket_client, "1.2.4", "14ec1ca4b6d247b44ccd9a80af8f6ca98328070f6c1d52a5cb00bc9d939d63b8", [], [], "hexpm"},
