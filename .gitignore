@@ -17,4 +17,4 @@ erl_crash.dump
 *.ez
 
 # Local variable definitions
-.env
+.envrc
