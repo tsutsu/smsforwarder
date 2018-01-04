@@ -13,6 +13,10 @@ defmodule SMSForwarder.VoIPms.Client do
     GenServer.call(__MODULE__, {:send_sms, dest_did, msg_body})
   end
 
+  def call(endpoint_name, args) do
+    GenServer.call(__MODULE__, {:call_endpoint, endpoint_name, args})
+  end
+
   # Server (callbacks)
 
   defstruct api_username: nil, api_password: nil, dids: []
@@ -41,6 +45,13 @@ defmodule SMSForwarder.VoIPms.Client do
 
     {:reply, :sending, state}
   end
+
+  def handle_call({:call_endpoint, endpoint_name, args}, _from, state) do
+    req_uri = state |> build_request_uri(endpoint_name, args)
+    resp = HTTPoison.get!(req_uri).body |> Poison.decode!
+    {:reply, resp, state}
+  end
+
   def handle_call(request, from, state), do: super(request, from, state)
 
   defp send_sms_chunk(msg_chunk, delay, {source_did, dest_did}, state) when byte_size(msg_chunk) <= 160 do
