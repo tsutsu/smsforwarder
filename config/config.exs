@@ -7,9 +7,5 @@ config :trot, :base_uri, URI.parse(web_base_uri)
 config :trot, :port, web_port
 config :trot, :router, SMSForwarder.HTTPRouter
 
-twilio_creds = System.get_env("TWILIO_CREDENTIALS") || "a:b"
-[twilio_id, twilio_secret] = twilio_creds |> String.split(":", parts: 2)
-
-config :ex_twilio,
-  account_sid: twilio_id,
-  auth_token:  twilio_secret
+config :ex_twilio, account_sid:   {:system, "TWILIO_ACCOUNT_SID"},
+                   auth_token:    {:system, "TWILIO_AUTH_TOKEN"}

@@ -18,11 +18,11 @@ defmodule SMSForwarder.Mixfile do
   defp deps, do: [
     {:slack, "~> 0.12.0"},
     {:ex_twilio, "~> 0.5.0"},
-    {:httpoison, "~> 0.13.0"},
+    {:httpoison, "~> 1.0", override: true},
     {:trot, "~> 0.6.0"},
     {:calendar, "~> 0.17.4"},
     {:poison, "~> 3.1"},
     {:exredis, "~> 0.2.5"},
-    {:xml_builder, "~> 0.1.1"}
+    {:xml_builder, "~> 2.1"}
   ]
 end
