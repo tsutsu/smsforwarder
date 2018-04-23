@@ -30,20 +30,20 @@ defmodule SMSForwarder.Slack.BotListener do
     {:ok, %{state | in_channels: channels}}
   end
 
-  def handle_event(_message = %{type: "message", subtype: "bot_message"}, _slack, state), do: {:ok, state}
-  def handle_event(message = %{type: "message"}, slack, state) do
-    if slack.me.id != message[:user] do
-      channel_name = lookup_channel_name(message.channel, slack)
-      if channel_name =~ ~r/^#\d{3}-\d{3}-\d{4}$/ do
-        dest_did = channel_name |> String.slice(1..-1) |> String.split("-") |> Enum.join
+  def handle_event(%{type: "message", subtype: "bot_message"}, _slack, state), do: {:ok, state}
+  def handle_event(%{type: "message", user: "USLACKBOT"}, _slack, state), do: {:ok, state}
+  def handle_event(%{type: "message", user: own_id}, %{me: %{id: own_id}}, state), do: {:ok, state}
+  def handle_event(%{type: "message"} = message, slack, state) do
+    case channel_to_did(message.channel, slack) do
+      {:ok, dest_did} ->
         Logger.debug ["Slack listener: received message event\n", inspect(message)]
         Task.Supervisor.start_child(SMSForwarder.TaskSupervisor, fn ->
           received_slack_message(message, dest_did, slack, state)
         end)
-      end
-    end
+        {:ok, state}
 
-    {:ok, state}
+      :error -> {:ok, state}
+    end
   end
   def handle_event(_, _, state), do: {:ok, state}
 
@@ -86,6 +86,16 @@ defmodule SMSForwarder.Slack.BotListener do
   end
   def handle_info(_, _, state), do: {:ok, state}
 
+
+  defp channel_to_did("D" <> _id, slack), do: :error
+  defp channel_to_did(channel_id, slack) do
+    channel_name = lookup_channel_name(channel_id, slack)
+
+    case Regex.scan(~r/^#(\d{3})-(\d{3})-(\d{4})$/, channel_name, capture: :all_but_first) do
+      [did_parts] when is_list(did_parts) -> {:ok, Enum.join(did_parts)}
+      [] -> :error
+    end
+  end
 
   defp attachment_path(att_id) do
     Path.join([:code.priv_dir(:trot), "static", "attachments", att_id])
