@@ -3,8 +3,8 @@ defmodule SMSForwarder.Mixfile do
 
   def project, do: [
     app: :sms_forwarder,
-    version: "0.1.0",
-    elixir: "~> 1.5",
+    version: "0.1.1",
+    elixir: "~> 1.6",
     build_embedded: Mix.env == :prod,
     start_permanent: Mix.env == :prod,
     deps: deps()
@@ -16,9 +16,9 @@ defmodule SMSForwarder.Mixfile do
   ]
 
   defp deps, do: [
-    {:slack, "~> 0.12.0"},
-    {:ex_twilio, "~> 0.5.0"},
-    {:httpoison, "~> 1.0", override: true},
+    {:slack, "~> 0.13.0"},
+    {:ex_twilio, "~> 0.6.0"},
+    {:httpoison, "~> 1.1", override: true},
     {:trot, "~> 0.6.0"},
     {:calendar, "~> 0.17.4"},
     {:poison, "~> 3.1"},
