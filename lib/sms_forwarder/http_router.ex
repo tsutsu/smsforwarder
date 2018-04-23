@@ -7,7 +7,7 @@ defmodule SMSForwarder.HTTPRouter do
   use Trot.Router
 
   get "/contacts" do
-    SMSForwarder.AddressBook.dump_all |> Poison.encode!
+    SMSForwarder.AddressBook.dump_all |> Jason.encode!
   end
 
   get "/contacts/add" do

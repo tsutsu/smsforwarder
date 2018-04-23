@@ -28,7 +28,7 @@ defmodule SMSForwarder.VoIPms.Client do
 
   def handle_cast({:query_sms_enabled_dids, account_id}, state) do
     req_uri = state |> build_request_uri(:getDIDsInfo, account: account_id)
-    %{"status" => "success", "dids" => resp_dids} = HTTPoison.get!(req_uri).body |> Poison.decode!
+    %{"status" => "success", "dids" => resp_dids} = HTTPoison.get!(req_uri).body |> Jason.decode!
 
     dids = resp_dids |>
       Enum.filter(fn(r) -> (r["sms_enabled"] == "1") end) |>
@@ -48,7 +48,7 @@ defmodule SMSForwarder.VoIPms.Client do
 
   def handle_call({:call_endpoint, endpoint_name, args}, _from, state) do
     req_uri = state |> build_request_uri(endpoint_name, args)
-    resp = HTTPoison.get!(req_uri).body |> Poison.decode!
+    resp = HTTPoison.get!(req_uri).body |> Jason.decode!
     {:reply, resp, state}
   end
 
@@ -60,7 +60,7 @@ defmodule SMSForwarder.VoIPms.Client do
       req_uri = state |> build_request_uri(:sendSMS, did: source_did, dst: dest_did, message: msg_chunk)
       msg_hash = :crypto.hash(:sha256, msg_chunk) |> Base.encode32(case: :lower, padding: :false) |> String.slice(0..7)
       Logger.debug ["Sending SMS [", msg_hash, "] ", source_did, "->", dest_did, ": ", msg_chunk]
-      %{"status" => "success", "sms" => _} = HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Poison.decode!
+      %{"status" => "success", "sms" => _} = HTTPoison.get!(req_uri, [], [timeout: 30_000, recv_timeout: 30_000]).body |> Jason.decode!
       Logger.debug ["Sent SMS [", msg_hash, "]"]
     end)
   end

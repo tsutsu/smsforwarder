@@ -21,7 +21,7 @@ defmodule SMSForwarder.Mixfile do
     {:httpoison, "~> 1.1", override: true},
     {:trot, "~> 0.6.0"},
     {:calendar, "~> 0.17.4"},
-    {:poison, "~> 3.1"},
+    {:jason, "~> 1.0"},
     {:exredis, "~> 0.2.5"},
     {:xml_builder, "~> 2.1"}
   ]

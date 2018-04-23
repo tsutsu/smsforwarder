@@ -74,7 +74,7 @@ defmodule SMSForwarder.Slack.BotListener do
       "image_url" => to_string(att[:uri])
     } end)
 
-    msg_event_opts = Map.put(msg_event_opts, :attachments, Poison.encode!(msg_attachments))
+    msg_event_opts = Map.put(msg_event_opts, :attachments, Jason.encode!(msg_attachments))
 
     Logger.debug ["posting msg with opts: ", inspect(msg_event_opts)]
 
