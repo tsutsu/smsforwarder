@@ -30,8 +30,7 @@ defmodule SMSForwarder.Slack.BotListener do
     {:ok, %{state | in_channels: channels}}
   end
 
-  def handle_event(%{type: "message", subtype: "bot_message"}, _slack, state), do: {:ok, state}
-  def handle_event(%{type: "message", subtype: "channel_archive"}, _slack, state), do: {:ok, state}
+  def handle_event(%{type: "message", subtype: subtype}, _slack, state) when is_binary(subtype), do: {:ok, state}
   def handle_event(%{type: "message", user: "USLACKBOT"}, _slack, state), do: {:ok, state}
   def handle_event(%{type: "message", user: own_id}, %{me: %{id: own_id}}, state), do: {:ok, state}
   def handle_event(%{type: "message"} = message, slack, state) do
