@@ -59,7 +59,20 @@ defmodule SMSForwarder.Slack.BotListener do
       bot_id = slack.me.id
 
       new_channel_id = SMSForwarder.Slack.Client.using(SMSForwarder.Slack.UserIdentity, fn ->
-        channel_id = Slack.Web.Channels.join(channel_name)["channel"]["id"]
+        channel_id = case Slack.Web.Channels.join(channel_name) do
+          %{"channel" => ch} -> Map.fetch!(ch, "id")
+          %{"error" => "is_archived"} ->
+            archived_channel_id = lookup_channel_id("##{channel_name}", slack)
+            # Slack.Web.Channels.list
+            # |> Map.fetch!("channels")
+            # |> Enum.find(&(Map.fetch(&1, "name") == channel_name))
+            # |> Map.fetch!("id")
+
+            Slack.Web.Channels.unarchive(archived_channel_id)
+            Slack.Web.Channels.join(channel_name)
+            archived_channel_id
+        end
+
         Slack.Web.Channels.invite(channel_id, bot_id)
         channel_id
       end)
