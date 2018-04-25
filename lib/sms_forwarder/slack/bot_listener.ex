@@ -79,10 +79,11 @@ defmodule SMSForwarder.Slack.BotListener do
 
     msg_event_opts = Map.put(msg_event_opts, :attachments, Jason.encode!(msg_attachments))
 
-    Logger.debug ["posting msg with opts: ", inspect(msg_event_opts)]
+    Logger.debug ["posting msg with opts: ", inspect({dest_channel_id, sms.body, msg_event_opts})]
 
     SMSForwarder.Slack.Client.using(SMSForwarder.Slack.BotIdentity, fn ->
-      Slack.Web.Chat.post_message(dest_channel_id, sms.body, msg_event_opts)
+      resp = Slack.Web.Chat.post_message(dest_channel_id, sms.body, msg_event_opts)
+      Logger.debug ["Slack replied: ", inspect(resp)]
     end)
 
     {:ok, state}
