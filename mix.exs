@@ -22,7 +22,6 @@ defmodule SMSForwarder.Mixfile do
     {:trot, "~> 0.6.0"},
     {:calendar, "~> 0.17.4"},
     {:jason, "~> 1.0"},
-    {:exredis, "~> 0.2.5"},
     {:xml_builder, "~> 2.1"}
   ]
 end

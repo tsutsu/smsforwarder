@@ -48,9 +48,9 @@ defmodule SMSForwarder.Slack.BotListener do
   def handle_event(_, _, state), do: {:ok, state}
 
   def handle_info({:echo_sms_to_slack, sms}, slack, state) do
-    channel_name = case SMSForwarder.VoIPms.Client.lookup_channel_name(sms.from) do
-      {:ok, channel_name} -> channel_name
-      :error -> [0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(sms.from, r) end) |> Enum.join("-")
+    {channel_nicknamed?, channel_name} = case SMSForwarder.VoIPms.Client.lookup_channel_name(sms.from) do
+      {:ok, channel_name} -> {true, channel_name}
+      :error -> {false, ([0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(sms.from, r) end) |> Enum.join("-"))}
     end
 
     {dest_channel_id, state} = if MapSet.member?(state.in_channels, channel_name) do
@@ -76,9 +76,11 @@ defmodule SMSForwarder.Slack.BotListener do
       {new_channel_id, %{state | in_channels: MapSet.put(state.in_channels, channel_name)}}
     end
 
-    msg_event_opts = case SMSForwarder.AddressBook.get(sms.from) do
-      :undefined -> %{as_user: true}
-      nickname   -> %{as_user: false, username: nickname}
+    msg_event_opts = if channel_nicknamed? do
+      {:ok, nickname} = SMSForwarder.VoIPms.Client.lookup_nickname(sms.from)
+      %{as_user: false, username: nickname}
+    else
+      %{as_user: true}
     end
 
     msg_attachments = sms.attachments |> Enum.map(fn(att) -> %{

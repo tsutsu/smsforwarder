@@ -6,22 +6,6 @@ defmodule SMSForwarder.HTTPRouter do
   plug Plug.Static, at: "/", from: :trot, only: ~w(attachments)
   use Trot.Router
 
-  get "/contacts" do
-    SMSForwarder.AddressBook.dump_all |> Jason.encode!
-  end
-
-  get "/contacts/add" do
-    conn = Plug.Conn.fetch_query_params(conn)
-    SMSForwarder.AddressBook.set(conn.params["did"], conn.params["name"])
-    "ok"
-  end
-
-  get "/contacts/remove" do
-    conn = Plug.Conn.fetch_query_params(conn)
-    SMSForwarder.AddressBook.unset(conn.params["did"])
-    "ok"
-  end
-
   get "/send" do
     conn = Plug.Conn.fetch_query_params(conn)
     msg = SMSForwarder.Message.from_voipms(conn.params)

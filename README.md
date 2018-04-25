@@ -25,5 +25,4 @@ SMSForwarder is configured entirely using environment variables:
 * `SLACK_USER_API_TOKEN`: an API token created using the Slack [legacy token generator](https://api.slack.com/custom-integrations/legacy-tokens), allowing control of the human responder-user's account (to manage automatic channel joins)
 * `VOIPMS_CREDENTIALS`: your VoIP.ms API credentials, in the format `email:api_password:account_id`
 * `VOIPMS_DID`: the DID in your VoIP.ms account which you want to be used for *sending* messages. Should be in 10-digit format, e.g. `5551234567`
-* `REDIS_URL` (optional): a Redis instance to hold DID nickname mappings (used by the bot user)
 * `TWILIO_CREDENTIALS` (optional): a Twilio API token—used for sending outbound MMS attachments

@@ -10,21 +10,12 @@ defmodule SMSForwarder do
     slack_user_api_token = System.get_env("SLACK_USER_API_TOKEN") || "slack_user"
     slack_bot_api_token = System.get_env("SLACK_BOT_API_TOKEN") || "slack_bot"
 
-    redis_uri = System.get_env("REDIS_URL")
-
     #sms_did = System.get_env("SMS_DID")
 
     # Define workers and child supervisors to be supervised
     children = [
       supervisor(Task.Supervisor, [[name: SMSForwarder.TaskSupervisor]])
     ]
-
-    children = children ++ if redis_uri do [
-      worker(SMSForwarder.RedisRepo, [redis_uri, [name: SMSForwarder.RedisRepo]]),
-      worker(SMSForwarder.AddressBook.Redis, [[name: SMSForwarder.AddressBook]])
-    ] else [
-      worker(SMSForwarder.AddressBook.InMemory, [[name: SMSForwarder.AddressBook]])
-    ] end
 
     children = children ++ [
       worker(SMSForwarder.Slack.Client, [slack_user_api_token, [name: SMSForwarder.Slack.UserIdentity]], id: SMSForwarder.Slack.UserClient),
