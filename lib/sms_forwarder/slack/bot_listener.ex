@@ -48,10 +48,13 @@ defmodule SMSForwarder.Slack.BotListener do
   def handle_event(_, _, state), do: {:ok, state}
 
   def handle_info({:echo_sms_to_slack, sms}, slack, state) do
-    channel_name = [0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(sms.from, r) end) |> Enum.join("-")
+    channel_name = case SMSForwarder.VoIPms.Client.lookup_channel_name(sms.from) do
+      {:ok, channel_name} -> channel_name
+      :error -> [0..2, 3..5, 6..9] |> Enum.map(fn(r) -> String.slice(sms.from, r) end) |> Enum.join("-")
+    end
 
-    {state, dest_channel_id} = if MapSet.member?(state.in_channels, channel_name) do
-      {state, lookup_channel_id("##{channel_name}", slack)}
+    {dest_channel_id, state} = if MapSet.member?(state.in_channels, channel_name) do
+      {lookup_channel_id("##{channel_name}", slack), state}
     else
       bot_id = slack.me.id
 
@@ -61,7 +64,7 @@ defmodule SMSForwarder.Slack.BotListener do
         channel_id
       end)
 
-      {%{state | in_channels: MapSet.put(state.in_channels, channel_name)}, new_channel_id}
+      {new_channel_id, %{state | in_channels: MapSet.put(state.in_channels, channel_name)}}
     end
 
     msg_event_opts = case SMSForwarder.AddressBook.get(sms.from) do
@@ -87,13 +90,17 @@ defmodule SMSForwarder.Slack.BotListener do
   def handle_info(_, _, state), do: {:ok, state}
 
 
-  defp channel_to_did("D" <> _id, slack), do: :error
+  defp channel_to_did("D" <> _id, _slack), do: :error
   defp channel_to_did(channel_id, slack) do
     channel_name = lookup_channel_name(channel_id, slack)
 
     case Regex.scan(~r/^#(\d{3})-(\d{3})-(\d{4})$/, channel_name, capture: :all_but_first) do
       [did_parts] when is_list(did_parts) -> {:ok, Enum.join(did_parts)}
-      [] -> :error
+      [] ->
+        case Regex.scan(~r/^#(\w+)$/, channel_name, capture: :all_but_first) do
+          [[channel_nickname]] -> SMSForwarder.VoIPms.Client.lookup_did(channel_name: channel_nickname)
+          _ -> :error
+        end
     end
   end
 
