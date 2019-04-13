@@ -30,6 +30,10 @@ defmodule SMSForwarder.HTTPRouter do
     send_resp(conn, 204, "")
   end
 
+  get "/heartbeat" do
+    send_resp(conn, 200, "ok")
+  end
+
   match _ do
     send_resp(conn, 404, "Route not found")
   end
