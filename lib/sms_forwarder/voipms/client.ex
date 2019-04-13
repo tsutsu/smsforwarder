@@ -76,7 +76,7 @@ defmodule SMSForwarder.VoIPms.Client do
     }}
   end
 
-  def handle_cast(request, state), do: super(request, state)
+  def handle_cast(_request, state), do: {:noreply, state}
 
   def handle_call({:send_sms, dest_did, text}, _from, state) do
     {_source_acct, source_did} = List.first(state.own_dids)
@@ -106,7 +106,7 @@ defmodule SMSForwarder.VoIPms.Client do
     {:reply, resp, state}
   end
 
-  def handle_call(request, from, state), do: super(request, from, state)
+  def handle_call(_request, _from, state), do: {:noreply, state}
 
   defp nickname_to_channel_name(nickname) do
     nickname_camelcased = nickname

@@ -27,7 +27,7 @@ defmodule SMSForwarder.Twilio.Client do
 
     {:noreply, %{state | dids: dids}}
   end
-  def handle_cast(request, state), do: super(request, state)
+  def handle_cast(_request, state), do: {:noreply, state}
 
   def handle_call({:send_sms, dest_did, text, atts}, _from, state) do
     source_did = List.first(state.dids)
@@ -36,7 +36,7 @@ defmodule SMSForwarder.Twilio.Client do
 
     {:reply, :sending, state}
   end
-  def handle_call(request, from, state), do: super(request, from, state)
+  def handle_call(_request, _from, state), do: {:noreply, state}
 
   defp send_sms({msg_body, msg_atts}, {source_did, dest_did}) do
     req = %{
