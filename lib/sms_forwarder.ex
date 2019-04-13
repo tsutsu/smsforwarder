@@ -23,15 +23,24 @@ defmodule SMSForwarder do
       worker(SMSForwarder.VoIPms.Client, [{voipms_username, voipms_password}, voipms_account]),
       worker(SMSForwarder.Twilio.Client, []),
       supervisor(SMSForwarder.ConversationSupervisor, [[name: SMSForwarder.ConversationSupervisor]]),
-      worker(SMSForwarder.Slack.BotListener, [])
+      worker(SMSForwarder.Slack.BotListener, []),
     ]
 
-
-#    :ets.new
+    children = children ++ [
+      Plug.Cowboy.child_spec(scheme: :http, plug: SMSForwarder.HTTPRouter, options: [port: http_port()])
+    ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SMSForwarder.Supervisor]
     Supervisor.start_link(children, opts)
   end
+
+  defp http_config do
+    {:ok, config} = Application.fetch_env(:sms_forwarder, SMSForwarder.HTTP)
+    config
+  end
+
+  def http_port, do: Keyword.fetch!(http_config(), :port)
+  def http_base_uri, do: URI.parse(Keyword.fetch!(http_config(), :base_uri))
 end

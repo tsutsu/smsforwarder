@@ -19,7 +19,7 @@ defmodule SMSForwarder.Mixfile do
     {:slack, "~> 0.15.0"},
     {:ex_twilio, "~> 0.7.0"},
     {:httpoison, "~> 1.2", override: true},
-    {:plug, "~> 1.8"},
+    {:plug_cowboy, "~> 2.0"},
     {:calendar, "~> 0.17.4"},
     {:jason, "~> 1.0"},
     {:xml_builder, "~> 2.1"}

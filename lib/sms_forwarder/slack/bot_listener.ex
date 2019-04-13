@@ -133,7 +133,7 @@ defmodule SMSForwarder.Slack.BotListener do
       IO.binwrite(f, slack_file.body)
     end)
 
-    image_newuri = Application.get_env(:trot, :base_uri)
+    image_newuri = SMSForwarder.http_base_uri()
     image_newuri = %{image_newuri | path: "/attachments/#{image_newname}"}
 
     Logger.debug ["New attachment URL: ", to_string(image_newuri)]
