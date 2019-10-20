@@ -21,14 +21,12 @@ defmodule SMSForwarder.Twilio.Client do
   end
 
   def handle_cast(:query_sms_enabled_dids, state) do
-    case ExTwilio.IncomingPhoneNumber.all() do
-      dids when is_list(dids) ->
-        Enum.filter(dids, fn(r) -> (r.capabilities["sms"] && r.capabilities["mms"]) end)
-        |> Enum.map(fn(r) -> r.phone_number end)
-        {:noreply, %{state | dids: dids}}
-      _err ->
-        {:noreply, state}
-    end
+    dids =
+      get_dids()
+      |> Enum.filter(fn(r) -> (r.capabilities["sms"] && r.capabilities["mms"]) end)
+      |> Enum.map(fn(r) -> r.phone_number end)
+
+    {:noreply, %{state | dids: dids}}
   end
   def handle_cast(_request, state), do: {:noreply, state}
 
@@ -40,6 +38,13 @@ defmodule SMSForwarder.Twilio.Client do
     {:reply, :sending, state}
   end
   def handle_call(_request, _from, state), do: {:noreply, state}
+
+
+  defp get_dids do
+    ExTwilio.IncomingPhoneNumber.all()
+  rescue _e in MatchError ->
+    []
+  end
 
   defp send_sms({msg_body, msg_atts}, {source_did, dest_did}) do
     req = %{
